@@ -1260,7 +1260,11 @@ module.exports = NodeHelper.create({
     // setup the final data to write out
     let r = {};
     // save the config info
-    r["config"] = data["config"];
+    let base_config=data["config"]
+    const base_converter = require(__dirname+'/schemas/base_converter.js')
+    if(base_converter)
+         base_config=base_converter.converter(base_config,'toConfig')
+    r["config"] = base_config;
     // move invididual modules entries into modules array for config.js
     r["config"]["modules"] = [];
 

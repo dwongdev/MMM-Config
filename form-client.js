@@ -1,13 +1,47 @@
+// on startup show some fields matching their data values..
 $(document).on('form_loaded', function () {
 
-  /* setup onclick handlers for the delete and deletecurrent buttons
-    add is handled by and onchange handler in the schema */
+  // set the add element click handler for the electron switches, to surface the default element when item added
+  $('.Base .electronSwitches ._jsonform-array-addmore').on('click', surfaceElectronSwitchFieldjustAdded );
+  
+  // show domainlist field if option selected
   let x=$('.corsType select').val()
   if(x === 'allowWhitelist')
      $('.corsDomainList').css('display','block')
+  
+  // add handling for electronSwitches, hidden by css.. surface entry option matching selected value  
+  $('select[class*=" typef"]  option:selected').each(
+		// process each
+      function(){
+        // get its selected option text
+        var selected_option_value=$(this).val(); //.text() contains the visible value from titlemap, .val() contains the enum value
+                                                // if no title map .text() and .val() are the same
+
+          // look above the select to the next element that encloses select and the custom fields (fieldset)
+          // this is all one clause, just split over multiple lines for clarity
+          if(selected_option_value === 'literal'){
+            $(this).closest('fieldset')
+              // find below the fieldset to find the appropriate div with the right class ending with this string,
+              .find('div[class$="---valuef"]')
+                // and set its display style property to block, previously set to display:none by MMM-Config.extension.css
+                .css('display','block')   
+          } else {
+            $(this).closest('fieldset')
+            // find below the fieldset to find the appropriate div with the right class ending with this string,,
+            .find('div[class$="---ovaluef"]')
+              // and set its display style property to block, previously set to display:none by MMM-Config.extension.css
+              .css('display','block')   
+          }
+      }
+    )
   }
+
 )
 
+function surfaceElectronSwitchFieldjustAdded(){
+  // find the last element added, its string value field,  and make it visible, hidden by css
+  $('.Base .electronSwitches ul').children().last().find('[class$="---valuef"]').css('display','block')
+}
 
 async function process_readme(readme_url, pos){
 

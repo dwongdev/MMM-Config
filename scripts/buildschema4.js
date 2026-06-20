@@ -32,6 +32,8 @@ if (process.argv.length > 3 && process.argv[3] === "saveform") {
      }
   }
 }
+const electron_switches_template=require(__dirname+'/../templates/electron_switches_form.json')
+const base_converter = require(__dirname+'/../schemas/base_converter.js')
 
 let multi_modules = [];
 let module_scripts = {};
@@ -1146,6 +1148,14 @@ for (let k of Object.keys(defines.config)) {
     base[k] = clone(defines.config[k]);
   }
 }
+if(base_converter){
+
+  if(debug)
+     console.log("converting for the base from ", base )
+  base = base_converter.converter(base, "toForm")
+  if(debug)
+     console.log("after converting for the base from ", base )
+}
 
 // save the the base MM values in the value section of the form
 value["config"] = base;
@@ -1699,6 +1709,19 @@ function find_empty_arrays(obj, stack, hash) {
   }
   return hash;
 }
+function mergeMissingConfigProperty(target, source) {
+  // Loop through all keys in the source object
+  for (const key in source) {
+    if (source.hasOwnProperty(key)) {
+      
+      // Case 1: Key doesn't exist in target at all -> copy it directly
+      if (!(key in target)) {
+        target[key] = source[key];
+      } 
+    }
+  }
+  return target;
+}
 function copyConfig(defines, schema, form) {
   schema["config"] = {
     type: "object",
@@ -1706,15 +1729,28 @@ function copyConfig(defines, schema, form) {
     properties: {}
   };
   schema["config"]["properties"] = {};
-  if(!Object.keys(defines.config).includes("userAgent"))
-    defines.config["userAgent"]=""
+  // get the current MM runtime understanding of config variables
+  base_variables=require("../../../js/defaults.js")
+  // check if the actual config has more
+  // this is defining the schema and form, not the actual data.
+  base_variables = mergeMissingConfigProperty(base_variables, defines.config)
+  //if(!Object.keys(defines.config).includes("userAgent"))
+  //  defines.config["userAgent"]=""
   // copy the current non modules stuff from config.js
-  for (const setting of Object.keys(defines.config)) {
+  for (const setting of Object.keys(base_variables/*defines.config*/)) {
     if (setting === "modules") continue;
     let dtype;
-    let t = typeof defines.config[setting];
+    let t = typeof base_variables[setting]; //was defines.config
+    if(base_variables[setting]==null)
+      t = 'string'
+    if(debug){
+      console.log("base setting="+setting+" type="+t)
+    }
     if (t === "object") {
-      if (Array.isArray(defines.config[setting])) {
+      if(debug)
+        console.log("checking type is array for "+setting+" "+Array.isArray(base_variables[setting])+'='+JSON.stringify(base_variables,null,2))
+    
+      if (Array.isArray(base_variables[setting])) {
         if (setting === "logLevel") {
           t = "string";
           schema["config"]["properties"][setting] = {
@@ -1725,13 +1761,20 @@ function copyConfig(defines, schema, form) {
               enum: ["INFO", "LOG", "WARN", "ERROR", "DEBUG"]
             }
           };
-        } 
+        } else if(setting === 'electronSwitches'){
+          if(debug)
+            console.log("setting elextronswitches to template")
+          t = 'array'
+          schema["config"]["properties"][setting] = clone(electron_switches_template.schema.electronSwitches)
+        }
         else {
+          if(debug)
+            console.log("processing other array for "+setting          )
           t = "array";
           dtype = "string";
-          if (defines.config[setting].length) {
-            dtype = typeof defines.config[setting][0];
-            if (Array.isArray(defines.config[setting][0])) dtype = "array";
+          if (base_variables[setting].length) {
+            dtype = typeof base_variables[setting][0];
+            if (Array.isArray(base_variables[setting][0])) dtype = "array";
           }
           schema["config"]["properties"][setting] = {
             type: t,
@@ -1740,7 +1783,9 @@ function copyConfig(defines, schema, form) {
           };
         }
       } else {
-        dtype = typeof Object.keys(defines.config[setting])[0];
+        if(debug)
+            console.log("processing NOT array for "+setting+" base value=",base_variables[setting])
+        dtype = typeof Object.keys(base_variables[setting]);
         if (dtype === "string") {
           pairVariables["config" + "." + setting] = 1;
           t = "array";
@@ -1800,13 +1845,60 @@ function copyConfig(defines, schema, form) {
             }
           };
           break;
+          case "zoom":
+          case "port":
+          case "checkServerInterval":
+            as = {
+              "type": "number",
+              "title": setting
+            }
+          break;
+          case "watchTargets":
+            as = {
+              type: "array",
+              title: setting,
+              "items": {
+                "type": "string"
+              }
+            } 
+          break;       
+          case "ignoreContentSecurityPolicy":
+          case "ignoreXOriginHeader":
+          case "useHttps":
+          case "reloadAfterServerRestart":  
+            as = {
+              type: "boolean",
+              title: setting
+            }
+            break;
+          case "basePath":
+          case "tls":
+          case "customCss":
+          case "foreignModulesDir":     
+          case "hideConfigSecrets":
+          case "httpHeaders":
+          case "httpsCertificate":
+          case "httpsPrivateKey":
+          case "defaultModulesDir":  
+            as = {
+              type: "string",
+              title: setting
+            }
+            break;  
         default:
+          if(debug)
+            console.log("unknown base config variable ="+setting+" type="+t)
       }
       schema["config"]["properties"][setting] = as;
     }
     switch (t) {
       case "array":
-        if(setting === "corsDomainWhitelist"){
+        if(setting == 'electronSwitches'){
+          if(debug)
+            console.log("setting electronswitches form to ",electron_switches_template.form[0])
+          form[0].items[0].items.push(clone(electron_switches_template.form[0]))
+        } 
+        else if(setting === "corsDomainWhitelist"){
           form[0].items[0].items.push({
             type: "array",
             deleteCurrent: false,
@@ -1820,6 +1912,8 @@ function copyConfig(defines, schema, form) {
             ]
           });
         } else {
+          if(debug)
+            console.log("pushing form for "+setting)
           form[0].items[0].items.push({
             type: "array",
             deleteCurrent: false,

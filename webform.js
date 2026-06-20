@@ -33,15 +33,18 @@ JSONForm.fieldTypes['pair'] = {
   // this is just to validate  the data on submit
   onSubmit: function(evt, elt){
 
-    let left_value = 0
-    // get the value of the left field
-    left_value=$(elt.el).find('#'+LeftID).val()
-   // console.log( "value="+y)
-   // it can't be empty
-    if(left_value==emptyString){
-      alert("definition for "+elt.el.firstChild.innerText+" cannot be empty")
-    }
-    return left_value!==emptyString
+    if(elt.el.checkVisibility()){
+      let left_value = 0
+      // get the value of the left field
+      left_value=$(elt.el).find('#'+LeftID).val()
+    // console.log( "value="+y)
+    // it can't be empty
+      if(left_value==emptyString){
+        alert("definition for "+elt.el.firstChild.innerText+" cannot be empty")
+      }
+      return left_value!==emptyString
+    } else
+      return true
   },
   // This is where you can complete the data that will be used
   // to run the template string

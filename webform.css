@@ -119,6 +119,7 @@ input1[type="checkbox"] {
     height: 2.1em;
 }
 
+/* used for readme viewer */
 #viewer thead {
     border-color: black;
 }
@@ -139,6 +140,12 @@ input1[type="checkbox"] {
     left:0%;
 }
 
+/* used for config.js settings */
 .corsDomainList { 
    display:none;
+}
+/* used for elecrtonSwitches, hide both fields, 
+   formclient load handler will surface appropriate field */
+div[class$="---valuef"], div[class$="---ovaluef"] {
+  display : none;
 }

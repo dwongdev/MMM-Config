@@ -1,0 +1,58 @@
+{
+  "schema": {
+    "electronSwitches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "typef": {
+            "type": "string",
+            "enum": [
+              "literal",
+              "other"
+            ]
+          },      
+          "valuef":{
+            "type":"string"
+          },
+          "ovaluef":{
+            "type":"pair"
+          }                      
+        }
+      }
+    }
+  },
+  "form": [
+    {
+      "type": "array",
+      "title": "electron runtime switches",
+      "draggable":false,
+      "htmlClass":"electronSwitches",
+      "items": {
+        "type": "fieldset",              
+        "items": [ 
+          {          
+            "title":"type",
+            "key": "config.electronSwitches[].typef",
+            "onChange":"(evt,node)=>{let choices=['literal','other'];let key=['---valuef','---ovaluef'];let value=evt.target.value;let index=choices.indexOf(value);var parentElement =$(evt.target).closest('fieldset');for(let i in choices){let target=parentElement.find('div[class$='+key[i]+']');let style=(index != i?'none':'block');target[0].style.display=style;}}",                        
+            "fieldHtmlClass":"typef",
+            "titleMap": {
+              "literal": "string",
+              "other":"key:value pair"
+            }
+          },
+          {
+            "title": "value",
+            "key": "config.electronSwitches[].valuef",
+            "fieldHtmlClass":"literal"
+          },
+          {
+            "title": "key/value pair",
+            "key": "config.electronSwitches[].ovaluef",  
+            "fieldHtmlClass":"other"                    
+          }
+        ]
+      }
+    }
+  ]  
+}
