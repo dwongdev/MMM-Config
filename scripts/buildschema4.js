@@ -1763,7 +1763,7 @@ function copyConfig(defines, schema, form) {
           };
         } else if(setting === 'electronSwitches'){
           if(debug)
-            console.log("setting elextronswitches to template")
+            console.log("setting electronswitches to template")
           t = 'array'
           schema["config"]["properties"][setting] = clone(electron_switches_template.schema.electronSwitches)
         }
@@ -1786,17 +1786,35 @@ function copyConfig(defines, schema, form) {
         if(debug)
             console.log("processing NOT array for "+setting+" base value=",base_variables[setting])
         dtype = typeof Object.keys(base_variables[setting]);
+        if(debug)
+              console.log("object dtype="+dtype)
         if (dtype === "string") {
           pairVariables["config" + "." + setting] = 1;
           t = "array";
           dtype = "pair";
-        }
-        schema["config"]["properties"][setting] = {
-          type: t,
-          title: setting,
-          items: { type: dtype }
-        };
-      }
+        } else if (dtype === "object"){
+            dtype='pair'
+            if(setting === 'electronOptions'){
+              if(debug)
+                console.log("setting electronOptions to template")
+              t = 'array'
+              schema["config"]["properties"][setting] = clone({
+                "type": "array",
+                "title": "electronOptions",
+                "items": {
+                  "type": "pair"
+                }
+              })
+            }
+           else {
+              schema["config"]["properties"][setting] = {
+                type: t,
+                title: setting,
+                items: { type: dtype }
+              };
+           }
+         }
+       }
     } else {
       let as = { type: t, title: setting };
       switch (setting) {

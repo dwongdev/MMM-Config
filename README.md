@@ -82,6 +82,13 @@ I added the following lines to magicmirror/run/compose.yaml
 the p in ports,  lines up in the same column as the restart line<br>
 there cannot be any tabs in the front of the two lines added, yaml is VERY strict about indentation
 
+if you want to be able to use the QR code to access the MMM-Config config page while deployed under docker, we need to add one more change to config.yaml
+
+     environment:
+       - HOST_IP=192.168.2.xxx   or wahtever you actual docker host is..
+
+the warning about tabs applies here too..
+
 after docker compose up -d<br>
 you should be able to use 
 ```sh

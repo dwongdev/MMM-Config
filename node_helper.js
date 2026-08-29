@@ -112,10 +112,12 @@ module.exports = NodeHelper.create({
       // use the environment variable if set
       if(process.env.HOST_HOSTNAME)
          this.hostname=process.env.HOST_HOSTNAME;
+      else if(fs.statSync('/.dockerenv'))
+         this.hostname = process.env.HOST_IP;
 
       this.config.url =
         "http://" +
-        (this.config.address == "0.0.0.0"
+        (config.address == "0.0.0.0"
           ? this.hostname
           : this.config.address) +
         ":" +
