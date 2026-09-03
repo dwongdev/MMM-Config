@@ -85,7 +85,7 @@ there cannot be any tabs in the front of the two lines added, yaml is VERY stric
 if you want to be able to use the QR code to access the MMM-Config config page while deployed under docker, we need to add one more change to config.yaml
 
      environment:
-       - HOST_IP=192.168.2.xxx   or wahtever you actual docker host is..
+       - HOST_IP=192.168.2.xxx   or whatever you actual docker host is..
 
 the warning about tabs applies here too..
 
