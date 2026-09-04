@@ -353,6 +353,15 @@
                   "keyword": {
                     "type": "string"
                   },
+                  "symbol": {
+                    "type":"string"
+                  },
+                  "color":{
+                    "type":"string"
+                  },
+                  "symbolClassName":{
+                    "type":"string"
+                  },
                   "transform": {
                     "type": "object",
                     "properties": {
@@ -724,6 +733,18 @@
               {
                 "title": "keyword",
                 "key": "calendar.config.customEvents[].keyword"
+              },
+              {
+                "title": "symbol",
+                "key": "calendar.config.customEvents[].symbol"
+              },
+              {
+                "title": "symbolClassName",
+                "key": "calendar.config.customEvents[].symbolClassName"
+              },
+              {
+                "title": "color",
+                "key": "calendar.config.customEvents[].color"
               },
               {
                 "type": "fieldset",
