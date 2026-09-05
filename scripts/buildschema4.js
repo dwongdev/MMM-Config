@@ -1822,7 +1822,7 @@ function copyConfig(defines, schema, form) {
           as = { type: "string", title: setting, enum: networkInterfaces };
           break;
         case "language":
-          as = { type: "string", title: setting, enum: languages };
+          as = { type: "string", title: setting, enum: languages , default: "en"};
           break;
         case "timeFormat":
           as = { type: "number", title: setting, enum: [12, 24] };
